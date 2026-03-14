@@ -1,0 +1,25 @@
+{
+  "name": "grand-stay-auth-service",
+  "version": "1.0.0",
+  "description": "Microservicio de autenticación - Grand-Stay",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "typeorm": "^0.3.17",
+    "reflect-metadata": "^0.1.13",
+    "mysql2": "^3.6.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
