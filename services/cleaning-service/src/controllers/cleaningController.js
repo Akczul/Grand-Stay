@@ -71,7 +71,7 @@ export const completeTask = async (req, res) => {
     // Una vez completada la limpieza, marcar habitación como Disponible
     try {
       await axios.patch(`${ROOMS_URL}/${tarea.habitacionId}/estado`, { estado: 'Disponible' }, {
-        headers: { 'x-user-rol': 'Recepcionista' },
+        headers: { 'x-user-rol': 'Limpieza' },
       });
     } catch (err) {
       console.warn('⚠️ No se pudo actualizar estado de habitación:', err.message);

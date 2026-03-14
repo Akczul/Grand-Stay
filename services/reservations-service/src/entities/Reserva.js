@@ -1,6 +1,6 @@
 // ============================================================
 // Entidad Reserva - TypeORM
-// Estados: Pendiente, Confirmada, CheckIn, CheckOut, Cancelada
+// Estados: Pendiente, Activa, Cancelada
 // ============================================================
 
 import { EntitySchema } from 'typeorm';
@@ -47,8 +47,12 @@ export const Reserva = new EntitySchema({
     },
     estado: {
       type: 'enum',
-      enum: ['Pendiente', 'Confirmada', 'CheckIn', 'CheckOut', 'Cancelada'],
-      default: "'Pendiente'",
+      enum: ['Pendiente', 'Activa', 'Cancelada', 'Confirmada', 'CheckIn', 'CheckOut'],
+      default: 'Pendiente',
+    },
+    fecha_checkin: {
+      type: 'timestamp',
+      nullable: true,
     },
     total: {
       type: 'decimal',
