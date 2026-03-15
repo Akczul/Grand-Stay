@@ -1,7 +1,7 @@
 // ============================================================
 // Entidad Habitacion - TypeORM
 // Tipos: Sencilla, Doble, Suite, Presidencial
-// Estados: Disponible, Ocupada, Sucia, Mantenimiento
+// Estados: Disponible, Reservada, Ocupada, Sucia, En Mantenimiento
 // ============================================================
 
 import { EntitySchema } from 'typeorm';
@@ -38,8 +38,8 @@ export const Habitacion = new EntitySchema({
     },
     estado: {
       type: 'enum',
-      enum: ['Disponible', 'Ocupada', 'Sucia', 'Mantenimiento'],
-      default: "'Disponible'",
+      enum: ['Disponible', 'Reservada', 'Ocupada', 'Sucia', 'En Mantenimiento', 'Mantenimiento'],
+      default: 'Disponible',
     },
     servicios_incluidos: {
       type: 'text',

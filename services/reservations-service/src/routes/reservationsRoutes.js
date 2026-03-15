@@ -4,7 +4,6 @@ import {
   getReservations,
   getReservationById,
   checkIn,
-  checkOut,
   cancelReservation,
 } from '../controllers/reservationsController.js';
 
@@ -14,7 +13,6 @@ router.post('/', createReservation);
 router.get('/', getReservations);
 router.get('/:id', getReservationById);
 router.patch('/:id/checkin', checkIn);
-router.patch('/:id/checkout', checkOut);
-router.patch('/:id/cancelar', cancelReservation);
+router.delete('/:id', cancelReservation);
 
 export default router;

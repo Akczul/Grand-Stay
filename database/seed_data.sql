@@ -29,7 +29,7 @@ INSERT INTO habitaciones (numero, tipo, tarifa_base, capacidad, estado, servicio
 ('203', 'Suite', 2500.00, 3, 'Disponible', '["WiFi","TV","Aire Acondicionado","Minibar","Jacuzzi","Room Service"]', 2, 'Suite con vista al mar'),
 ('301', 'Presidencial', 5000.00, 4, 'Disponible', '["WiFi","TV","Aire Acondicionado","Minibar","Jacuzzi","Room Service","Butler","Terraza Privada"]', 3, 'Suite Presidencial - máximo lujo'),
 ('104', 'Sencilla', 800.00, 1, 'Sucia', '["WiFi","TV"]', 1, 'Habitación sencilla básica'),
-('204', 'Doble', 1200.00, 2, 'Mantenimiento', '["WiFi","TV","Minibar"]', 2, 'Habitación en reparación');
+('204', 'Doble', 1200.00, 2, 'En Mantenimiento', '["WiFi","TV","Minibar"]', 2, 'Habitación en reparación');
 
 -- =============================================
 -- 3. INSUMOS DE LIMPIEZA (cleaning service - grand_stay_cleaning)
