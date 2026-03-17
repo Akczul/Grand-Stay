@@ -67,7 +67,7 @@ export const Factura = new EntitySchema({
     },
     estado: {
       type: 'enum',
-      enum: ['Pendiente', 'Pagada', 'Anulada'],
+      enum: ['Pendiente', 'Emitida', 'Pagada', 'Anulada'],
       default: "'Pendiente'",
     },
     metodo_pago: {
