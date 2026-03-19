@@ -15,11 +15,11 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
-app.use('/', consumptionsRoutes);
-
 app.get('/health', (req, res) => {
   res.json({ service: 'consumptions-service', status: 'activo', puerto: PORT });
 });
+
+app.use('/', consumptionsRoutes);
 
 const start = async () => {
   await initDatabase();
