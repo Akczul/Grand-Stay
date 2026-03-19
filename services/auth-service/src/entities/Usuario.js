@@ -34,7 +34,7 @@ export const Usuario = new EntitySchema({
     rol: {
       type: 'enum',
       enum: ['Administrador', 'Recepcionista', 'Limpieza', 'Huesped'],
-      default: "'Huesped'",
+      default: 'Huesped',
     },
     activo: {
       type: 'boolean',

@@ -223,6 +223,9 @@ mysql -u root -p < database/seed_data.sql
 - `GET /api/consumptions` - Listar consumos
 - `POST /api/consumptions` - Registrar consumo
 - `GET /api/consumptions/reserva/:reservaId` - Consumos por reserva
+- `GET /api/consumptions/filtro` - Filtrar consumos por rango de fechas, reserva, tipo o concepto
+- `POST /api/consumptions/validar-limite` - Validar límite máximo de consumos por reserva
+- `GET /api/consumptions/auditoria` - Auditoría de consumos (creación/modificación/estado)
 
 ### Billing (`/api/billing`)
 - `GET /api/billing` - Listar facturas
@@ -283,3 +286,11 @@ Grand-Stay/
 - **Nodemailer** usa cuentas de prueba de Ethereal por defecto en desarrollo; los emails se pueden visualizar en la URL que muestra la consola
 - Si un microservicio no está disponible, los demás siguen funcionando (arquitectura resiliente)
 - El frontend usa Vite proxy para redirigir `/api` al gateway en desarrollo
+
+## Mejoras Consumptions Service (Issue 2)
+
+- Prevención de duplicados en creación de consumos por `reservaId + concepto + monto + fecha` (retorna HTTP `409`)
+- Nuevo endpoint de filtrado avanzado: `GET /api/consumptions/filtro?fecha_inicio=&fecha_fin=&reservaId=&concepto=&tipo=`
+- Nuevo endpoint de validación de límite por reserva: `POST /api/consumptions/validar-limite`
+- Nuevo endpoint de auditoría: `GET /api/consumptions/auditoria`
+- Entidad `Consumo` con campos de estado y timestamps de auditoría (`createdAt`, `updatedAt`)

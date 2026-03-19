@@ -47,3 +47,80 @@ INSERT INTO insumos (nombre, cantidad, unidad, stockMinimo, categoria) VALUES
 ('Bolsas de basura', 200, 'unidades', 50, 'limpieza'),
 ('Aromatizante', 25, 'litros', 5, 'limpieza'),
 ('Cloro', 3, 'litros', 10, 'limpieza');
+
+-- =============================================
+-- 4. CONSUMOS DE PRUEBA (consumptions service - grand_stay_consumptions)
+-- =============================================
+USE grand_stay_consumptions;
+
+INSERT INTO consumos (reservaId, concepto, tipo, descripcion, monto, cantidad, fecha, estado) VALUES
+(1, 'Desayuno buffet', 'restaurante', 'Buffet americano para 1 persona', 35.00, 1, '2026-03-10', 'Confirmado'),
+(1, 'Minibar agua', 'minibar', 'Botella de agua mineral 600ml', 4.50, 2, '2026-03-10', 'Confirmado'),
+(2, 'Masaje relajante', 'spa', 'Sesión de 45 minutos', 60.00, 1, '2026-03-11', 'Pendiente'),
+(2, 'Lavado express', 'lavanderia', 'Servicio express de 24 horas', 18.00, 1, '2026-03-11', 'Pendiente'),
+(3, 'Cena a la habitación', 'restaurante', 'Menú ejecutivo', 42.00, 1, '2026-03-12', 'Confirmado'),
+(3, 'Snack minibar', 'minibar', 'Papas y chocolate', 9.00, 1, '2026-03-12', 'Cancelado'),
+(4, 'Late checkout', 'otros', 'Recargo por salida tardía', 25.00, 1, '2026-03-13', 'Confirmado'),
+(5, 'Desayuno continental', 'restaurante', 'Incluye fruta y café', 28.00, 1, '2026-03-14', 'Pendiente');
+
+-- ============================================================
+-- 5. SERVICIO DE FACTURACIÓN (grand_stay_billing)
+-- ============================================================
+CREATE DATABASE IF NOT EXISTS grand_stay_billing 
+    CHARACTER SET utf8mb4 
+    COLLATE utf8mb4_unicode_ci;
+
+USE grand_stay_billing;
+
+INSERT INTO facturas (numeroFactura, reservaId, usuarioId, fechaEmision, fechaVencimiento, subtotal, impuestos, descuentos, total, estado, tipoDocumento) VALUES
+('FAC-2026-0001', 1, 4, '2026-03-10 10:00:00', '2026-03-17', 1674.00, 318.06, 0.00, 1992.06, 'Pagada', 'Factura'),
+('FAC-2026-0002', 2, 4, '2026-03-11 11:30:00', '2026-03-18', 2478.00, 470.82, 0.00, 2948.82, 'Pendiente', 'Factura'),
+('FAC-2026-0003', 3, 4, '2026-03-12 09:15:00', '2026-03-19', 7551.00, 1434.69, 100.00, 8885.69, 'Parcial', 'Factura'),
+('FAC-2026-0004', 4, 4, '2026-03-13 14:00:00', '2026-03-20', 825.00, 156.75, 0.00, 981.75, 'Pendiente', 'Factura'),
+('FAC-2026-0005', 5, 4, '2026-03-14 16:45:00', '2026-03-21', 5028.00, 955.32, 0.00, 5983.32, 'Pendiente', 'Factura');
+
+-- =============================================
+-- INSERTAR DETALLES DE FACTURA
+-- =============================================
+INSERT INTO detalles_factura (facturaId, concepto, descripcion, cantidad, precioUnitario, subtotal, tipo, consumoId) VALUES
+-- Factura 1
+(1, 'Habitación 101 - 2 noches', 'Habitación Sencilla', 2, 800.00, 1600.00, 'habitacion', NULL),
+(1, 'Desayuno buffet', 'Buffet americano para 1 persona', 1, 35.00, 35.00, 'consumo', 1),
+(1, 'Minibar agua', 'Botella de agua mineral 600ml', 2, 4.50, 9.00, 'consumo', 2),
+(1, 'IVA 19%', 'Impuesto al Valor Agregado', 1, 318.06, 318.06, 'impuesto', NULL),
+
+-- Factura 2
+(2, 'Habitación 103 - 2 noches', 'Habitación Doble', 2, 1200.00, 2400.00, 'habitacion', NULL),
+(2, 'Masaje relajante', 'Sesión de 45 minutos', 1, 60.00, 60.00, 'servicio', 3),
+(2, 'Lavado express', 'Servicio express de 24 horas', 1, 18.00, 18.00, 'servicio', 4),
+(2, 'IVA 19%', 'Impuesto al Valor Agregado', 1, 470.82, 470.82, 'impuesto', NULL),
+
+-- Factura 3
+(3, 'Habitación 202 - 3 noches', 'Suite con sala de estar', 3, 2500.00, 7500.00, 'habitacion', NULL),
+(3, 'Cena a la habitación', 'Menú ejecutivo', 1, 42.00, 42.00, 'consumo', 5),
+(3, 'Snack minibar', 'Papas y chocolate', 1, 9.00, 9.00, 'consumo', 6),
+(3, 'IVA 19%', 'Impuesto al Valor Agregado', 1, 1434.69, 1434.69, 'impuesto', NULL),
+(3, 'Descuento especial', 'Promoción temporada baja', 1, -100.00, -100.00, 'descuento', NULL),
+
+-- Factura 4
+(4, 'Habitación 102 - 1 noche', 'Habitación Sencilla', 1, 800.00, 800.00, 'habitacion', NULL),
+(4, 'Late checkout', 'Recargo por salida tardía', 1, 25.00, 25.00, 'servicio', 7),
+(4, 'IVA 19%', 'Impuesto al Valor Agregado', 1, 156.75, 156.75, 'impuesto', NULL),
+
+-- Factura 5
+(5, 'Habitación 203 - 2 noches', 'Suite con vista al mar', 2, 2500.00, 5000.00, 'habitacion', NULL),
+(5, 'Desayuno continental', 'Incluye fruta y café', 1, 28.00, 28.00, 'consumo', 8),
+(5, 'IVA 19%', 'Impuesto al Valor Agregado', 1, 955.32, 955.32, 'impuesto', NULL);
+
+-- =============================================
+-- INSERTAR PAGOS
+-- =============================================
+INSERT INTO pagos (facturaId, monto, fechaPago, metodoPago, estado, referencia, comprobante) VALUES
+(1, 1992.06, '2026-03-10 10:15:00', 'Tarjeta Crédito', 'Completado', 'TXN-20260310-001', 'comprobante_001.pdf'),
+(3, 4000.00, '2026-03-12 09:30:00', 'Transferencia', 'Completado', 'TRANS-20260312-003', 'comprobante_003.pdf');
+
+-- =============================================
+-- INSERTAR REEMBOLSOS
+-- =============================================
+INSERT INTO reembolsos (facturaId, pagoId, monto, motivo, estado, notas) VALUES
+(1, 1, 50.00, 'Cancelación parcial de servicio', 'Procesado', 'Reembolso por cancelación de minibar');
