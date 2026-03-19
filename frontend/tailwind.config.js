@@ -7,22 +7,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#1e3a5f',
-          600: '#1a3353',
-          700: '#162b47',
-          800: '#12233b',
-          900: '#0e1b2f',
+        gold: {
+          200: '#f0dfa0',
+          300: '#e8d49c',
+          400: '#d4af37',
+          500: '#c9a047',
+          600: '#b8882a',
+          700: '#9a6e1e',
+          800: '#7a5518',
         },
-        hotel: {
-          gold: '#d4a853',
-          cream: '#faf8f5',
-          dark: '#1e3a5f',
+        surface: {
+          900: '#07070d',
+          800: '#0d0d1a',
+          700: '#12121f',
+          600: '#181828',
+          500: '#1e1e30',
+          400: '#252538',
+        },
+        cream: {
+          50:  '#fdfaf4',
+          100: '#f5f0e8',
+          200: '#e8dfc8',
+          300: '#d4c8a4',
+        },
+      },
+      fontFamily: {
+        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      animation: {
+        'fade-in':      'fadeIn 0.4s ease-out',
+        'slide-up':     'slideUp 0.35s ease-out',
+        'slide-right':  'slideInRight 0.35s ease-out',
+        'pulse-gold':   'pulseGold 2.5s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeIn:       { from: { opacity: '0' }, to: { opacity: '1' } },
+        slideUp:      { from: { opacity: '0', transform: 'translateY(18px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        slideInRight: { from: { opacity: '0', transform: 'translateX(110%)' }, to: { opacity: '1', transform: 'translateX(0)' } },
+        pulseGold: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(201,160,71,0.25)' },
+          '50%':      { boxShadow: '0 0 0 10px rgba(201,160,71,0)' },
         },
       },
     },
