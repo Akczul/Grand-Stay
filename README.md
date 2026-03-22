@@ -189,14 +189,32 @@ mysql -u root -p < database/seed_data.sql
 | Insumos | X | - | X | - |
 | Reportes | X | - | - | - |
 
+## Características Implementadas
+
+### Consumptions Service (Puerto 3004)
+
+Permite registrar cargos adicionales (restaurante, spa, lavandería, minibar) vinculados a una reserva activa. Los consumos se validan contra el servicio de reservaciones para asegurar que solo se registren en reservas con estado "Activa". Cada consumo incluye: tipo, descripción, monto y cantidad.
+
+### Billing Service (Puerto 3005)
+
+Genera facturas consolidadas al momento del check-out, sumando automáticamente la tarifa de habitación con todos los consumos registrados. La factura incluye el cálculo de IVA (16%), desglose detallado de consumos y almacenamiento del estado de pago (Emitida, Pagada, Anulada).
+
+### Notifications Service (Puerto 3007)
+
+Envía notificaciones por email con plantillas HTML profesionales en tres momentos clave: confirmación de reserva, código de acceso y factura electrónica. En desarrollo utiliza Ethereal (servidor SMTP de prueba) y en producción soporta cualquier servidor SMTP real. Los emails se envían automáticamente tras eventos del ciclo de reserva.
+
+Consulta [IMPLEMENTACION_MICROSERVICIOS.md](./IMPLEMENTACION_MICROSERVICIOS.md) para documentación detallada de endpoints y [ESQUEMA_BD.md](./ESQUEMA_BD.md) para el esquema de bases de datos.
+
 ## Reglas de Negocio
 
 1. Una habitación en estado **"Sucia"** o **"En Mantenimiento"** NO puede ser reservada
 2. El **check-out** genera automáticamente la factura sumando reserva + todos los consumos
 3. Al confirmar una reserva, **notifications-service** envía email automáticamente
-4. Solo el **Administrador** puede cambiar tarifas de temporada
-5. Solo el **Recepcionista** puede asignar y cambiar el estado de habitaciones
-6. Los **reportes** solo son accesibles para el rol Administrador
+4. Solo se permiten consumos en reservas con estado **"Activa"**
+5. Cada reserva puede tener solo una factura asociada
+6. Solo el **Administrador** puede cambiar tarifas de temporada
+7. Solo el **Recepcionista** puede asignar y cambiar el estado de habitaciones
+8. Los **reportes** solo son accesibles para el rol Administrador
 
 ## Requisitos Funcionales de Notificaciones
 

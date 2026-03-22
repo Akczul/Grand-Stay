@@ -18,7 +18,8 @@ const TASA_IMPUESTO = 0.16; // 16% IVA
 // --- Generar factura (llamado automáticamente en check-out) ---
 export const generateInvoice = async (req, res) => {
   try {
-    const { reservaId } = req.body;
+    // Soporta tanto POST /generar/:reservaId como POST /generar { reservaId }
+    const reservaId = req.params.reservaId || req.body?.reservaId;
 
     if (!reservaId) {
       return res.status(400).json({ error: 'reservaId es requerido' });
@@ -66,9 +67,11 @@ export const generateInvoice = async (req, res) => {
       impuestos: Math.round(impuestos * 100) / 100,
       total_final: Math.round(totalFinal * 100) / 100,
       detalle_consumos: JSON.stringify(consumos),
+      estado: 'Emitida',  // RF-08: Factura emitida al generar
     });
 
     const guardada = await facturaRepo().save(factura);
+<<<<<<< HEAD
 
     // --- RF-10: Enviar factura electrónica por email (no falla si el email falla) ---
     try {
@@ -109,6 +112,14 @@ export const generateInvoice = async (req, res) => {
     }
 
     res.status(201).json({ mensaje: 'Factura generada', factura: guardada });
+=======
+    
+    res.status(201).json({ 
+      mensaje: 'Factura generada',
+      factura: guardada,
+      id: guardada.id
+    });
+>>>>>>> 9f531214cd201d378273a540e4962121833f4d5b
   } catch (error) {
     console.error('Error generando factura:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
