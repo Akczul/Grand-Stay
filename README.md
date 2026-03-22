@@ -198,6 +198,14 @@ mysql -u root -p < database/seed_data.sql
 5. Solo el **Recepcionista** puede asignar y cambiar el estado de habitaciones
 6. Los **reportes** solo son accesibles para el rol Administrador
 
+## Requisitos Funcionales de Notificaciones
+
+- **RF-09:** Email de confirmación de reserva  
+  Al crear una reserva exitosamente, se envía automáticamente un email al huésped con número de reserva, fechas, tipo de habitación, código de acceso y total estimado.
+
+- **RF-10:** Email de factura electrónica  
+  Al realizar check-out y generar la factura, se envía automáticamente un email con el detalle completo en HTML (hospedaje, consumos, impuestos y total final).
+
 ## Endpoints Principales (API Gateway)
 
 ### Auth (`/api/auth`)

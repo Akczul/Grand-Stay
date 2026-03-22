@@ -11,6 +11,7 @@ const facturaRepo = () => AppDataSource.getRepository(Factura);
 
 const RESERVATIONS_URL = process.env.RESERVATIONS_SERVICE_URL || 'http://localhost:3003';
 const CONSUMPTIONS_URL = process.env.CONSUMPTIONS_SERVICE_URL || 'http://localhost:3004';
+const NOTIFICATIONS_URL = process.env.NOTIFICATIONS_SERVICE_URL || 'http://localhost:3007';
 
 const TASA_IMPUESTO = 0.16; // 16% IVA
 
@@ -68,6 +69,45 @@ export const generateInvoice = async (req, res) => {
     });
 
     const guardada = await facturaRepo().save(factura);
+
+    // --- RF-10: Enviar factura electrónica por email (no falla si el email falla) ---
+    try {
+      if (reserva.huespedEmail) {
+        // Convertir JSON de consumos a formato legible
+        let detalleConsumos = '';
+        if (consumos && consumos.length > 0) {
+          detalleConsumos = consumos
+            .map(c => `• ${c.descripcion || 'Consumo'}: $${parseFloat(c.monto || 0).toFixed(2)}`)
+            .join('\n');
+        } else {
+          detalleConsumos = 'Sin consumos adicionales';
+        }
+
+        await axios.post(`${NOTIFICATIONS_URL}/notify`, {
+          tipo: 'factura_electronica',
+          destinatario: reserva.huespedEmail,
+          datos: {
+            nombre: reserva.huespedNombre,
+            numero_factura: guardada.id,
+            habitacion: reserva.habitacionNumero,
+            fecha_inicio: new Date(reserva.fecha_inicio).toLocaleDateString('es-MX'),
+            fecha_fin: new Date(reserva.fecha_fin).toLocaleDateString('es-MX'),
+            fecha_emision: new Date().toLocaleDateString('es-MX'),
+            subtotal: guardada.subtotal,
+            consumos_total: guardada.consumos_total,
+            total_final: guardada.total_final,
+            detalleConsumos,
+          },
+        });
+        console.log(`📧 Email de factura enviado a ${reserva.huespedEmail}`);
+      } else {
+        console.warn('⚠️ No se envió factura por email: no hay email del huésped');
+      }
+    } catch (error) {
+      console.error(`⚠️ Error enviando email de factura: ${error.message}`);
+      // No falla la factura si el email no se envía
+    }
+
     res.status(201).json({ mensaje: 'Factura generada', factura: guardada });
   } catch (error) {
     console.error('Error generando factura:', error);
