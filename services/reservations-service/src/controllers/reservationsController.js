@@ -9,6 +9,8 @@ import { Reserva } from '../entities/Reserva.js';
 
 const reservaRepo = () => AppDataSource.getRepository(Reserva);
 const ROOMS_URL = process.env.ROOMS_SERVICE_URL || 'http://localhost:3002';
+const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3001';
+const NOTIFICATIONS_URL = process.env.NOTIFICATIONS_SERVICE_URL || 'http://localhost:3007';
 
 const activeReservationStates = ['Pendiente', 'Activa', 'Confirmada', 'CheckIn'];
 const blockedRoomStates = ['Sucia', 'En Mantenimiento', 'Mantenimiento', 'Ocupada', 'Reservada'];
@@ -57,8 +59,21 @@ export const createReservation = async (req, res) => {
     const noches = Math.ceil((new Date(fecha_fin) - new Date(fecha_inicio)) / (1000 * 60 * 60 * 24));
     const total = parseFloat(habitacion.tarifa_base || 0) * noches;
 
+    // Obtener datos del huésped desde auth-service
+    let huespedNombre = '';
+    let huespedEmail = '';
+    try {
+      const huespedRes = await axios.get(`${AUTH_URL}/${huespedId}`);
+      huespedNombre = huespedRes.data.nombre || `Huésped ${huespedId}`;
+      huespedEmail = huespedRes.data.email || '';
+    } catch (error) {
+      console.warn(`⚠️ No se pudo obtener datos del huésped ${huespedId}`);
+    }
+
     const reserva = reservaRepo().create({
       huespedId: parseInt(huespedId),
+      huespedNombre,
+      huespedEmail,
       habitacionId: parseInt(habitacionId),
       habitacionNumero: habitacion.numero,
       fecha_inicio,
@@ -82,6 +97,34 @@ export const createReservation = async (req, res) => {
         error: 'No se pudo reservar la habitación en rooms-service',
         detalle: error.message,
       });
+    }
+
+    // --- RF-09: Enviar email de confirmación (no falla la reserva si el email falla) ---
+    try {
+      if (huespedEmail) {
+        const codigoAcceso = `GS${guardada.id.toString().padStart(6, '0')}`;
+        await axios.post(`${NOTIFICATIONS_URL}/notify`, {
+          tipo: 'confirmacion_reserva',
+          destinatario: huespedEmail,
+          datos: {
+            nombre: huespedNombre,
+            numero_reserva: guardada.id,
+            habitacion: habitacion.numero,
+            tipo: habitacion.tipo || 'Estándar',
+            fecha_inicio: new Date(fecha_inicio).toLocaleDateString('es-MX'),
+            fecha_fin: new Date(fecha_fin).toLocaleDateString('es-MX'),
+            noches,
+            total: guardada.total,
+            codigoAcceso,
+          },
+        });
+        console.log(`📧 Email de confirmación enviado a ${huespedEmail}`);
+      } else {
+        console.warn('⚠️ No se envió email: no hay email del huésped');
+      }
+    } catch (error) {
+      console.error(`⚠️ Error enviando email de confirmación: ${error.message}`);
+      // No falla la reserva si el email no se envía
     }
 
     res.status(201).json({ mensaje: 'Reserva creada exitosamente', reserva: guardada });
