@@ -1,6 +1,6 @@
 // ============================================================
 // Entidad Consumo - TypeORM
-// Tipos: restaurante, spa, lavandería, minibar, otros
+// Tipos/Conceptos de consumo con trazabilidad de auditoria
 // ============================================================
 
 import { EntitySchema } from 'typeorm';
@@ -18,15 +18,20 @@ export const Consumo = new EntitySchema({
       type: 'int',
       nullable: false,
     },
+    concepto: {
+      type: 'varchar',
+      length: 120,
+      nullable: true,
+    },
     tipo: {
       type: 'enum',
       enum: ['restaurante', 'spa', 'lavanderia', 'minibar', 'otros'],
-      nullable: false,
+      nullable: true,
     },
     descripcion: {
       type: 'varchar',
       length: 255,
-      nullable: false,
+      nullable: true,
     },
     monto: {
       type: 'decimal',
@@ -39,12 +44,21 @@ export const Consumo = new EntitySchema({
       default: 1,
     },
     fecha: {
-      type: 'timestamp',
-      default: () => 'CURRENT_TIMESTAMP',
+      type: 'date',
+      default: () => 'CURRENT_DATE',
+    },
+    estado: {
+      type: 'enum',
+      enum: ['Pendiente', 'Confirmado', 'Cancelado'],
+      default: 'Pendiente',
     },
     createdAt: {
       type: 'timestamp',
       createDate: true,
+    },
+    updatedAt: {
+      type: 'timestamp',
+      updateDate: true,
     },
   },
 });
