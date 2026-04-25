@@ -1,0 +1,45 @@
+# =====================================================
+# Backend — Node.js + Express + TypeORM (microservicios)
+# =====================================================
+
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Variables de entorno (cada servicio tiene su propio .env)
+.env
+.env.*
+!.env.example
+
+# Build / cache
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+
+# Lock files alternativos (mantener solo package-lock.json)
+yarn.lock
+pnpm-lock.yaml
+
+# Volcados de base de datos generados localmente
+*.dump
+*.sql.bak
+database/dumps/
+
+# Archivos PID y temporales de runtime
+*.pid
+*.seed
+pids/
+
+# Carpetas de uploads / adjuntos generados por servicios
+uploads/
+tmp/
