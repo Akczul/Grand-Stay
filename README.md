@@ -43,6 +43,38 @@ Grand-Stay/
 
 ## Inicio Rápido
 
+### Opción recomendada: Docker Compose
+
+Desde la raíz del proyecto:
+
+```powershell
+docker compose up -d --build
+```
+
+Esto levanta en una sola ejecución:
+
+- Frontend: http://localhost:5173
+- API Gateway: http://localhost:4000
+- MySQL: localhost:3306
+- Microservicios backend: puertos 3001 a 3008
+
+Comandos útiles:
+
+```powershell
+docker compose ps
+docker compose logs -f api-gateway
+docker compose down
+```
+
+Si necesitas reinicializar la base de datos desde `Backend/database/Grand-Stay.sql`, elimina también el volumen:
+
+```powershell
+docker compose down -v
+docker compose up -d --build
+```
+
+### Opción manual
+
 1. **Levantar el backend** — sigue [Backend/README.md](Backend/README.md) (crear DBs, instalar dependencias, levantar API Gateway + 8 microservicios).
 2. **Levantar el frontend** — sigue [Frontend/README.md](Frontend/README.md) (`npm install && npm run dev`).
 3. Acceder a **http://localhost:5173**.

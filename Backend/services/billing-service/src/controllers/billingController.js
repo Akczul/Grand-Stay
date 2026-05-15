@@ -14,7 +14,7 @@ const facturaRepo = () => AppDataSource.getRepository(Factura);
 const itemRepo    = () => AppDataSource.getRepository(ItemFactura);
 
 const RESERVATIONS_URL = process.env.RESERVATIONS_SERVICE_URL  || 'http://localhost:3003';
-const CONSUMPTIONS_URL = process.env.CONSUMPTIONS_SERVICE_URL  || 'http://localhost:3005';
+const CONSUMPTIONS_URL = process.env.CONSUMPTIONS_SERVICE_URL  || 'http://localhost:3004';
 
 const METODOS_PAGO  = ['efectivo', 'tarjeta_credito', 'tarjeta_debito', 'transferencia', 'credito_hotel', 'mixto'];
 const ESTADOS_PAGO  = ['pendiente', 'pagada', 'parcial', 'anulada'];

@@ -23,14 +23,14 @@ app.use(express.json());
 
 // --- Mapa de microservicios y sus puertos ---
 const services = {
-  '/api/auth':          { target: 'http://localhost:3001', public: true },
-  '/api/rooms':         { target: 'http://localhost:3002', public: false },
-  '/api/reservations':  { target: 'http://localhost:3003', public: false },
-  '/api/consumptions':  { target: 'http://localhost:3004', public: false },
-  '/api/billing':       { target: 'http://localhost:3005', public: false },
-  '/api/cleaning':      { target: 'http://localhost:3006', public: false },
-  '/api/notifications': { target: 'http://localhost:3007', public: false },
-  '/api/reports':       { target: 'http://localhost:3008', public: false },
+  '/api/auth':          { target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001', public: true },
+  '/api/rooms':         { target: process.env.ROOMS_SERVICE_URL || 'http://localhost:3002', public: false },
+  '/api/reservations':  { target: process.env.RESERVATIONS_SERVICE_URL || 'http://localhost:3003', public: false },
+  '/api/consumptions':  { target: process.env.CONSUMPTIONS_SERVICE_URL || 'http://localhost:3004', public: false },
+  '/api/billing':       { target: process.env.BILLING_SERVICE_URL || 'http://localhost:3005', public: false },
+  '/api/cleaning':      { target: process.env.CLEANING_SERVICE_URL || 'http://localhost:3006', public: false },
+  '/api/notifications': { target: process.env.NOTIFICATIONS_SERVICE_URL || 'http://localhost:3007', public: false },
+  '/api/reports':       { target: process.env.REPORTS_SERVICE_URL || 'http://localhost:3008', public: false },
 };
 
 // --- Configurar proxy para cada microservicio ---

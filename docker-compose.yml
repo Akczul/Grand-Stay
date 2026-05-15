@@ -1,0 +1,257 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: grandstay-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: grandstay_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - grandstay_mysql_data:/var/lib/mysql
+      - ./Backend/database/Grand-Stay.sql:/docker-entrypoint-initdb.d/01-grandstay.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  auth-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/auth-service
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+      JWT_SECRET: grand_stay_secret_key_2024
+      JWT_EXPIRES_IN: 24h
+    ports:
+      - "3001:3001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  rooms-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/rooms-service
+    restart: unless-stopped
+    environment:
+      PORT: 3002
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+      RESERVATIONS_SERVICE_URL: http://reservations-service:3003
+    ports:
+      - "3002:3002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  reservations-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/reservations-service
+    restart: unless-stopped
+    environment:
+      PORT: 3003
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+      ROOMS_SERVICE_URL: http://rooms-service:3002
+      BILLING_SERVICE_URL: http://billing-service:3005
+      NOTIFICATIONS_SERVICE_URL: http://notifications-service:3007
+    ports:
+      - "3003:3003"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rooms-service:
+        condition: service_started
+      notifications-service:
+        condition: service_started
+
+  consumptions-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/consumptions-service
+    restart: unless-stopped
+    environment:
+      PORT: 3004
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+      RESERVATIONS_SERVICE_URL: http://reservations-service:3003
+    ports:
+      - "3004:3004"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      reservations-service:
+        condition: service_started
+
+  billing-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/billing-service
+    restart: unless-stopped
+    environment:
+      PORT: 3005
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+      RESERVATIONS_SERVICE_URL: http://reservations-service:3003
+      CONSUMPTIONS_SERVICE_URL: http://consumptions-service:3004
+    ports:
+      - "3005:3005"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      reservations-service:
+        condition: service_started
+      consumptions-service:
+        condition: service_started
+
+  cleaning-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/cleaning-service
+    restart: unless-stopped
+    environment:
+      PORT: 3006
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+      ROOMS_SERVICE_URL: http://rooms-service:3002
+    ports:
+      - "3006:3006"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rooms-service:
+        condition: service_started
+
+  notifications-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/notifications-service
+    restart: unless-stopped
+    environment:
+      PORT: 3007
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+      SMTP_HOST: smtp.ethereal.email
+      SMTP_PORT: 587
+      SMTP_USER: tu_usuario
+      SMTP_PASS: tu_password
+      SMTP_FROM: Grand-Stay Hotel <noreply@grandstay.com>
+    ports:
+      - "3007:3007"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  reports-service:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: services/reports-service
+    restart: unless-stopped
+    environment:
+      PORT: 3008
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: grandstay_db
+    ports:
+      - "3008:3008"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.node-service
+      args:
+        SERVICE_DIR: api-gateway
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      JWT_SECRET: grand_stay_secret_key_2024
+      FRONTEND_URL: http://localhost:5173
+      AUTH_SERVICE_URL: http://auth-service:3001
+      ROOMS_SERVICE_URL: http://rooms-service:3002
+      RESERVATIONS_SERVICE_URL: http://reservations-service:3003
+      CONSUMPTIONS_SERVICE_URL: http://consumptions-service:3004
+      BILLING_SERVICE_URL: http://billing-service:3005
+      CLEANING_SERVICE_URL: http://cleaning-service:3006
+      NOTIFICATIONS_SERVICE_URL: http://notifications-service:3007
+      REPORTS_SERVICE_URL: http://reports-service:3008
+    ports:
+      - "4000:4000"
+    depends_on:
+      auth-service:
+        condition: service_started
+      rooms-service:
+        condition: service_started
+      reservations-service:
+        condition: service_started
+      consumptions-service:
+        condition: service_started
+      billing-service:
+        condition: service_started
+      cleaning-service:
+        condition: service_started
+      notifications-service:
+        condition: service_started
+      reports-service:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./Frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      api-gateway:
+        condition: service_started
+
+volumes:
+  grandstay_mysql_data:
